@@ -143,12 +143,10 @@ const SimulationGrid = ({ selectedTool, onInterventionComplete }) => {
     updateStatistics(newGrid);
   }, [isRunning, grid, simulationParams, setGrid, updateStatistics]);
 
-  // Start the game loop when simulation is running
+  // Set up the game loop
   useEffect(() => {
-    if (isRunning) {
-      gameLoop(0, updateSimulation);
-    }
-  }, [isRunning, gameLoop, updateSimulation]);
+    gameLoop(updateSimulation);
+  }, [gameLoop, updateSimulation]);
 
   // Initialize random infections
   const handleRandomInfections = useCallback(() => {

@@ -1,9 +1,10 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 
 export const useGameLoop = () => {
   const [isRunning, setIsRunning] = useState(false);
   const animationFrameRef = useRef(null);
   const lastTimeRef = useRef(0);
+  const updateFunctionRef = useRef(null);
 
   const startSimulation = useCallback(() => {
     setIsRunning(true);
@@ -13,21 +14,39 @@ export const useGameLoop = () => {
     setIsRunning(false);
     if (animationFrameRef.current) {
       cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
     }
   }, []);
 
-  const gameLoop = useCallback((currentTime, updateFunction) => {
-    if (!isRunning) return;
+  const gameLoop = useCallback((updateFunction) => {
+    updateFunctionRef.current = updateFunction;
+  }, []);
 
-    // Cap at 60 FPS
-    if (currentTime - lastTimeRef.current >= 16.67) { // ~60 FPS
-      updateFunction();
-      lastTimeRef.current = currentTime;
+  // Main animation loop
+  useEffect(() => {
+    const animate = (currentTime) => {
+      if (isRunning && updateFunctionRef.current) {
+        // Cap at 60 FPS
+        if (currentTime - lastTimeRef.current >= 16.67) { // ~60 FPS
+          updateFunctionRef.current();
+          lastTimeRef.current = currentTime;
+        }
+      }
+      
+      if (isRunning) {
+        animationFrameRef.current = requestAnimationFrame(animate);
+      }
+    };
+
+    if (isRunning) {
+      animationFrameRef.current = requestAnimationFrame(animate);
     }
 
-    animationFrameRef.current = requestAnimationFrame((time) => 
-      gameLoop(time, updateFunction)
-    );
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
   }, [isRunning]);
 
   return {
