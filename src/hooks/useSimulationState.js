@@ -20,11 +20,11 @@ const createEmptyGrid = (rows = 150, cols = 200) => {
 export const useSimulationState = () => {
   const [grid, setGrid] = useState(() => createEmptyGrid());
   const [simulationParams, setSimulationParams] = useState({
-    transmissionRate: 2, // Number of infected neighbors needed
-    infectionDuration: 50, // Frames before recovery/death
-    recoveryRate: 0.8, // Probability of recovery vs death
-    immunityDuration: 100, // Frames of immunity
-    mortalityRate: 0.2, // Probability of death when infected
+    transmissionRate: 1, // Number of infected neighbors needed (changed from 2 to 1)
+    infectionDuration: 30, // Frames before recovery/death (changed from 50 to 30)
+    recoveryRate: 0.7, // Probability of recovery vs death (changed from 0.8 to 0.7)
+    immunityDuration: 80, // Frames of immunity (changed from 100 to 80)
+    mortalityRate: 0.3, // Probability of death when infected (changed from 0.2 to 0.3)
   });
 
   const [statistics, setStatistics] = useState({

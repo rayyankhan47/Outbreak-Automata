@@ -156,6 +156,29 @@ const SimulationGrid = ({ selectedTool, onInterventionComplete }) => {
     setGrid(newGrid);
   }, [grid, setGrid]);
 
+  // Enhanced start simulation with automatic infections if none exist
+  const handleStartSimulation = useCallback(() => {
+    // Check if there are any infected cells
+    let hasInfected = false;
+    for (let y = 0; y < grid.length; y++) {
+      for (let x = 0; x < grid[y].length; x++) {
+        if (grid[y][x].state === 'infected') {
+          hasInfected = true;
+          break;
+        }
+      }
+      if (hasInfected) break;
+    }
+    
+    // If no infections exist, add some random ones
+    if (!hasInfected) {
+      const newGrid = initializeRandomInfections(grid, 15);
+      setGrid(newGrid);
+    }
+    
+    startSimulation();
+  }, [grid, setGrid, startSimulation]);
+
   return (
     <div className="simulation-grid">
       <canvas
@@ -164,7 +187,7 @@ const SimulationGrid = ({ selectedTool, onInterventionComplete }) => {
         className={`simulation-canvas ${selectedTool ? 'tool-selected' : ''}`}
       />
       <div className="simulation-controls">
-        <button onClick={isRunning ? stopSimulation : startSimulation}>
+        <button onClick={isRunning ? stopSimulation : handleStartSimulation}>
           {isRunning ? 'Pause' : 'Start'}
         </button>
         <button onClick={handleRandomInfections}>
