@@ -1,12 +1,21 @@
 import React, { useRef, useEffect, useCallback } from 'react';
 import { useSimulationState } from '../hooks/useSimulationState';
 import { useGameLoop } from '../hooks/useGameLoop';
+import { updateGrid, initializeRandomInfections } from '../utils/simulationEngine';
 import './SimulationGrid.css';
 
 const SimulationGrid = () => {
   const canvasRef = useRef(null);
-  const { grid, setGrid, simulationParams } = useSimulationState();
-  const { isRunning, startSimulation, stopSimulation } = useGameLoop();
+  const { 
+    grid, 
+    setGrid, 
+    simulationParams, 
+    statistics, 
+    updateStatistics,
+    resetSimulation 
+  } = useSimulationState();
+  
+  const { isRunning, startSimulation, stopSimulation, gameLoop } = useGameLoop();
 
   // Canvas setup
   useEffect(() => {
@@ -75,6 +84,28 @@ const SimulationGrid = () => {
     }
   }, [grid, setGrid]);
 
+  // Simulation update function
+  const updateSimulation = useCallback(() => {
+    if (!isRunning) return;
+    
+    const newGrid = updateGrid(grid, simulationParams);
+    setGrid(newGrid);
+    updateStatistics(newGrid);
+  }, [isRunning, grid, simulationParams, setGrid, updateStatistics]);
+
+  // Start the game loop when simulation is running
+  useEffect(() => {
+    if (isRunning) {
+      gameLoop(0, updateSimulation);
+    }
+  }, [isRunning, gameLoop, updateSimulation]);
+
+  // Initialize random infections
+  const handleRandomInfections = useCallback(() => {
+    const newGrid = initializeRandomInfections(grid, 20);
+    setGrid(newGrid);
+  }, [grid, setGrid]);
+
   return (
     <div className="simulation-grid">
       <canvas
@@ -86,6 +117,20 @@ const SimulationGrid = () => {
         <button onClick={isRunning ? stopSimulation : startSimulation}>
           {isRunning ? 'Pause' : 'Start'}
         </button>
+        <button onClick={handleRandomInfections}>
+          Random Infections
+        </button>
+        <button onClick={resetSimulation}>
+          Reset
+        </button>
+      </div>
+      <div className="simulation-stats">
+        <div>Frame: {statistics.frame}</div>
+        <div>Healthy: {statistics.healthy}</div>
+        <div>Infected: {statistics.infected}</div>
+        <div>Recovered: {statistics.recovered}</div>
+        <div>Dead: {statistics.dead}</div>
+        <div>R-Value: {statistics.rValue}</div>
       </div>
     </div>
   );

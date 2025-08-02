@@ -27,6 +27,8 @@
   display: flex;
   gap: 10px;
   align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .simulation-controls button {
@@ -41,6 +43,7 @@
   font-family: 'Courier New', monospace;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  font-size: 0.9rem;
 }
 
 .simulation-controls button:hover {
@@ -51,4 +54,34 @@
 
 .simulation-controls button:active {
   transform: translateY(0);
+}
+
+.simulation-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+  min-width: 300px;
+}
+
+.simulation-stats div {
+  text-align: center;
+  padding: 8px;
+  background: #f9fafb;
+  border-radius: 4px;
+  border: 1px solid #e5e7eb;
+  font-weight: 600;
+}
+
+.simulation-stats div:first-child {
+  grid-column: 1 / -1;
+  background: #1f2937;
+  color: #ffffff;
+  font-size: 1rem;
 } 
