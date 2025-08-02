@@ -1,0 +1,54 @@
+.simulation-grid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+}
+
+.simulation-canvas {
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  cursor: crosshair;
+  transition: box-shadow 0.2s ease;
+}
+
+.simulation-canvas:hover {
+  box-shadow: 
+    0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.simulation-controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.simulation-controls button {
+  padding: 10px 20px;
+  border: 2px solid #374151;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #374151;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Courier New', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.simulation-controls button:hover {
+  background: #374151;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.simulation-controls button:active {
+  transform: translateY(0);
+} 
