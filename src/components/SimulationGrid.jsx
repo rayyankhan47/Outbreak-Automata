@@ -185,6 +185,7 @@ const SimulationGrid = ({ selectedTool, onInterventionComplete }) => {
 
   // Update simulation speed in real-time when it changes
   useEffect(() => {
+    console.log('SimulationGrid received speed change:', simulationParams.simulationSpeed);
     updateSimulationSpeed(simulationParams.simulationSpeed);
   }, [simulationParams.simulationSpeed, updateSimulationSpeed]);
 

@@ -22,10 +22,12 @@ export const useGameLoop = () => {
   const gameLoop = useCallback((updateFunction, simulationSpeed = 0.2) => {
     updateFunctionRef.current = updateFunction;
     simulationSpeedRef.current = simulationSpeed;
+    console.log('Game loop set up with speed:', simulationSpeed);
   }, []);
 
   // Function to update simulation speed dynamically
   const updateSimulationSpeed = useCallback((newSpeed) => {
+    console.log('Updating simulation speed to:', newSpeed);
     simulationSpeedRef.current = newSpeed;
   }, []);
 

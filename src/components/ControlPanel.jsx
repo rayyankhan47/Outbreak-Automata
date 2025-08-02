@@ -35,7 +35,10 @@ const ControlPanel = ({ simulationParams, updateParams }) => {
             max="5.0"
             step="0.1"
             value={simulationParams.simulationSpeed}
-            onChange={(e) => handleParamChange('simulationSpeed', e.target.value)}
+            onChange={(e) => {
+              console.log('Speed slider changed to:', e.target.value);
+              handleParamChange('simulationSpeed', e.target.value);
+            }}
           />
         </label>
         <span className="help-text">Speed multiplier (0.1x = slow, 5.0x = fast)</span>
