@@ -143,15 +143,29 @@ const SimulationGrid = ({ selectedTool, onInterventionComplete }) => {
       if (onInterventionComplete) {
         onInterventionComplete();
       }
-    } else if (grid[y]?.[x]?.state === 'healthy') {
-      // Place infection if no tool selected and cell contains a healthy person
+    } else {
+      // Handle infection placement
       const newGrid = [...grid];
-      newGrid[y][x] = { 
-        state: 'infected', 
-        infectionTime: 0,
-        variant: 'alpha'
-      };
-      setGrid(newGrid);
+      const cell = newGrid[y]?.[x];
+      
+      if (cell && cell.state === 'healthy') {
+        // Click on healthy person - infect them
+        newGrid[y][x] = { 
+          state: 'infected', 
+          infectionTime: 0,
+          variant: 'alpha'
+        };
+        setGrid(newGrid);
+      } else if (!cell) {
+        // Click on empty space - place new infected person
+        newGrid[y][x] = { 
+          state: 'infected', 
+          infectionTime: 0,
+          variant: 'alpha'
+        };
+        setGrid(newGrid);
+      }
+      // Click on infected/recovered/dead person - no effect
     }
   }, [grid, setGrid, selectedTool, onInterventionComplete]);
 
