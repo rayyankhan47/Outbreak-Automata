@@ -3,6 +3,7 @@ import './ControlPanel.css';
 
 const ControlPanel = ({ simulationParams, updateParams }) => {
   const handleParamChange = (param, value) => {
+    console.log(`Updating ${param} to ${value}`);
     updateParams({ [param]: parseFloat(value) });
   };
 
@@ -10,6 +11,36 @@ const ControlPanel = ({ simulationParams, updateParams }) => {
     <div className="control-panel">
       <h3>Simulation Parameters</h3>
       
+      <div className="control-group">
+        <label>
+          Population Density: {(simulationParams.populationDensity * 100).toFixed(0)}%
+          <input
+            type="range"
+            min="0.1"
+            max="0.8"
+            step="0.1"
+            value={simulationParams.populationDensity}
+            onChange={(e) => handleParamChange('populationDensity', e.target.value)}
+          />
+        </label>
+        <span className="help-text">Percentage of cells that contain people</span>
+      </div>
+
+      <div className="control-group">
+        <label>
+          Simulation Speed: {simulationParams.simulationSpeed}x
+          <input
+            type="range"
+            min="0.1"
+            max="5.0"
+            step="0.1"
+            value={simulationParams.simulationSpeed}
+            onChange={(e) => handleParamChange('simulationSpeed', e.target.value)}
+          />
+        </label>
+        <span className="help-text">Speed multiplier (0.1x = slow, 5.0x = fast)</span>
+      </div>
+
       <div className="control-group">
         <label>
           Transmission Rate: {simulationParams.transmissionRate}

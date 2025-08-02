@@ -14,7 +14,8 @@ export const countInfectedNeighbors = (grid, x, y) => {
       
       // Check bounds
       if (ny >= 0 && ny < grid.length && nx >= 0 && nx < grid[ny].length) {
-        if (grid[ny][nx]?.state === 'infected') {
+        const neighbor = grid[ny][nx];
+        if (neighbor && neighbor.state === 'infected') {
           count++;
         }
       }
@@ -32,7 +33,8 @@ export const isNearHospital = (grid, x, y) => {
       const nx = x + dx;
       
       if (ny >= 0 && ny < grid.length && nx >= 0 && nx < grid[ny].length) {
-        if (grid[ny][nx]?.intervention === 'hospital') {
+        const cell = grid[ny][nx];
+        if (cell && cell.intervention === 'hospital') {
           return true;
         }
       }
@@ -43,11 +45,14 @@ export const isNearHospital = (grid, x, y) => {
 
 // Check if cell is in quarantine zone (reduces transmission)
 export const isInQuarantine = (grid, x, y) => {
-  return grid[y]?.[x]?.intervention === 'quarantine';
+  const cell = grid[y]?.[x];
+  return cell && cell.intervention === 'quarantine';
 };
 
 // Update a single cell based on simulation rules
 export const updateCell = (cell, infectedNeighbors, params, grid, x, y) => {
+  if (!cell) return null; // Empty space stays empty
+  
   const newCell = { ...cell };
   
   switch (cell.state) {
@@ -116,13 +121,23 @@ export const updateCell = (cell, infectedNeighbors, params, grid, x, y) => {
 
 // Update the entire grid for one simulation step
 export const updateGrid = (grid, params) => {
+  // Debug: Log current parameters every 60 frames (once per second)
+  if (Math.random() < 0.016) { // ~1/60 chance per frame
+    console.log('Current simulation params:', params);
+  }
+  
   const newGrid = [];
   
   for (let y = 0; y < grid.length; y++) {
     newGrid[y] = [];
     for (let x = 0; x < grid[y].length; x++) {
-      const infectedNeighbors = countInfectedNeighbors(grid, x, y);
-      newGrid[y][x] = updateCell(grid[y][x], infectedNeighbors, params, grid, x, y);
+      const cell = grid[y][x];
+      if (cell) {
+        const infectedNeighbors = countInfectedNeighbors(grid, x, y);
+        newGrid[y][x] = updateCell(cell, infectedNeighbors, params, grid, x, y);
+      } else {
+        newGrid[y][x] = null; // Keep empty spaces empty
+      }
     }
   }
   
@@ -142,9 +157,10 @@ export const applyIntervention = (grid, interventionType, x, y) => {
           const nx = x + dx;
           
           if (ny >= 0 && ny < newGrid.length && nx >= 0 && nx < newGrid[ny].length) {
-            if (newGrid[ny][nx].state === 'healthy') {
+            const cell = newGrid[ny][nx];
+            if (cell && cell.state === 'healthy') {
               newGrid[ny][nx] = {
-                ...newGrid[ny][nx],
+                ...cell,
                 state: 'recovered',
                 immunityTime: 0,
                 intervention: 'vaccinated'
@@ -163,10 +179,13 @@ export const applyIntervention = (grid, interventionType, x, y) => {
           const nx = x + dx;
           
           if (ny >= 0 && ny < newGrid.length && nx >= 0 && nx < newGrid[ny].length) {
-            newGrid[ny][nx] = {
-              ...newGrid[ny][nx],
-              intervention: 'quarantine'
-            };
+            const cell = newGrid[ny][nx];
+            if (cell) {
+              newGrid[ny][nx] = {
+                ...cell,
+                intervention: 'quarantine'
+              };
+            }
           }
         }
       }
@@ -175,10 +194,13 @@ export const applyIntervention = (grid, interventionType, x, y) => {
     case 'hospital':
       // Place a hospital (single cell)
       if (y >= 0 && y < newGrid.length && x >= 0 && x < newGrid[y].length) {
-        newGrid[y][x] = {
-          ...newGrid[y][x],
-          intervention: 'hospital'
-        };
+        const cell = newGrid[y][x];
+        if (cell) {
+          newGrid[y][x] = {
+            ...cell,
+            intervention: 'hospital'
+          };
+        }
       }
       break;
       
@@ -195,18 +217,27 @@ export const initializeRandomInfections = (grid, numInfections = 10) => {
   const rows = grid.length;
   const cols = grid[0].length;
   
-  for (let i = 0; i < numInfections; i++) {
-    const y = Math.floor(Math.random() * rows);
-    const x = Math.floor(Math.random() * cols);
-    
-    if (newGrid[y][x].state === 'healthy') {
-      newGrid[y][x] = {
-        state: 'infected',
-        infectionTime: 0,
-        immunityTime: 0,
-        variant: 'alpha'
-      };
+  // Find all cells that contain people
+  const populatedCells = [];
+  for (let y = 0; y < rows; y++) {
+    for (let x = 0; x < cols; x++) {
+      if (newGrid[y][x] && newGrid[y][x].state === 'healthy') {
+        populatedCells.push({ x, y });
+      }
     }
+  }
+  
+  // Randomly infect some people
+  for (let i = 0; i < Math.min(numInfections, populatedCells.length); i++) {
+    const randomIndex = Math.floor(Math.random() * populatedCells.length);
+    const { x, y } = populatedCells.splice(randomIndex, 1)[0];
+    
+    newGrid[y][x] = {
+      state: 'infected',
+      infectionTime: 0,
+      immunityTime: 0,
+      variant: 'alpha'
+    };
   }
   
   return newGrid;
@@ -220,10 +251,12 @@ export const calculateRValue = (grid, params) => {
   for (let y = 0; y < grid.length; y++) {
     for (let x = 0; x < grid[y].length; x++) {
       const cell = grid[y][x];
-      if (cell.state === 'infected') {
-        totalInfected++;
-      } else if (cell.state === 'healthy') {
-        totalSusceptible++;
+      if (cell) { // Only count cells that contain people
+        if (cell.state === 'infected') {
+          totalInfected++;
+        } else if (cell.state === 'healthy') {
+          totalSusceptible++;
+        }
       }
     }
   }

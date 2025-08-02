@@ -37,7 +37,9 @@ const SimulationGrid = ({ selectedTool, onInterventionComplete }) => {
     const cols = Math.floor(ctx.canvas.width / cellSize);
     const rows = Math.floor(ctx.canvas.height / cellSize);
 
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    // Clear canvas with white background
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
     for (let y = 0; y < rows; y++) {
       for (let x = 0; x < cols; x++) {
@@ -52,6 +54,7 @@ const SimulationGrid = ({ selectedTool, onInterventionComplete }) => {
             drawInterventionIndicator(ctx, x * cellSize, y * cellSize, cellSize, cell.intervention);
           }
         }
+        // Empty spaces remain white (transparent)
       }
     }
   }, []);
@@ -123,7 +126,7 @@ const SimulationGrid = ({ selectedTool, onInterventionComplete }) => {
         onInterventionComplete();
       }
     } else if (grid[y]?.[x]?.state === 'healthy') {
-      // Place infection if no tool selected
+      // Place infection if no tool selected and cell contains a healthy person
       const newGrid = [...grid];
       newGrid[y][x] = { 
         state: 'infected', 
@@ -143,10 +146,10 @@ const SimulationGrid = ({ selectedTool, onInterventionComplete }) => {
     updateStatistics(newGrid);
   }, [isRunning, grid, simulationParams, setGrid, updateStatistics]);
 
-  // Set up the game loop
+  // Set up the game loop with simulation speed
   useEffect(() => {
-    gameLoop(updateSimulation);
-  }, [gameLoop, updateSimulation]);
+    gameLoop(updateSimulation, simulationParams.simulationSpeed);
+  }, [gameLoop, updateSimulation, simulationParams.simulationSpeed]);
 
   // Initialize random infections
   const handleRandomInfections = useCallback(() => {
@@ -160,7 +163,7 @@ const SimulationGrid = ({ selectedTool, onInterventionComplete }) => {
     let hasInfected = false;
     for (let y = 0; y < grid.length; y++) {
       for (let x = 0; x < grid[y].length; x++) {
-        if (grid[y][x].state === 'infected') {
+        if (grid[y][x] && grid[y][x].state === 'infected') {
           hasInfected = true;
           break;
         }

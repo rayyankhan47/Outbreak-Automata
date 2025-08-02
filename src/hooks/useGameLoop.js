@@ -5,6 +5,7 @@ export const useGameLoop = () => {
   const animationFrameRef = useRef(null);
   const lastTimeRef = useRef(0);
   const updateFunctionRef = useRef(null);
+  const simulationSpeedRef = useRef(1.0);
 
   const startSimulation = useCallback(() => {
     setIsRunning(true);
@@ -18,16 +19,21 @@ export const useGameLoop = () => {
     }
   }, []);
 
-  const gameLoop = useCallback((updateFunction) => {
+  const gameLoop = useCallback((updateFunction, simulationSpeed = 1.0) => {
     updateFunctionRef.current = updateFunction;
+    simulationSpeedRef.current = simulationSpeed;
   }, []);
 
   // Main animation loop
   useEffect(() => {
     const animate = (currentTime) => {
       if (isRunning && updateFunctionRef.current) {
-        // Cap at 60 FPS
-        if (currentTime - lastTimeRef.current >= 16.67) { // ~60 FPS
+        // Calculate frame rate based on simulation speed
+        const baseFrameRate = 60; // 60 FPS base
+        const targetFrameRate = baseFrameRate * simulationSpeedRef.current;
+        const frameInterval = 1000 / targetFrameRate;
+        
+        if (currentTime - lastTimeRef.current >= frameInterval) {
           updateFunctionRef.current();
           lastTimeRef.current = currentTime;
         }
