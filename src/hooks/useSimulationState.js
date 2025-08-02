@@ -32,7 +32,7 @@ export const useSimulationState = () => {
     immunityDuration: 80, // Frames of immunity
     mortalityRate: 0.3, // Probability of death when infected
     populationDensity: 0.3, // Percentage of cells that contain people (0.1 to 0.8)
-    simulationSpeed: 1.0, // Speed multiplier (0.1 to 5.0)
+    simulationSpeed: 0.2, // Speed multiplier (0.1 to 5.0) - default to slower speed
   });
 
   const [statistics, setStatistics] = useState({

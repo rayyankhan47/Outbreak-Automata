@@ -16,7 +16,7 @@ const SimulationGrid = ({ selectedTool, onInterventionComplete }) => {
     resetSimulation 
   } = useSimulationState();
   
-  const { isRunning, startSimulation, stopSimulation, gameLoop } = useGameLoop();
+  const { isRunning, startSimulation, stopSimulation, gameLoop, updateSimulationSpeed } = useGameLoop();
 
   // Canvas setup
   useEffect(() => {
@@ -45,7 +45,7 @@ const SimulationGrid = ({ selectedTool, onInterventionComplete }) => {
       for (let x = 0; x < cols; x++) {
         const cell = currentGrid[y]?.[x];
         if (cell) {
-          const color = getCellColor(cell);
+          const color = getCellColor(cell, simulationParams);
           ctx.fillStyle = color;
           ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
           
@@ -53,19 +53,27 @@ const SimulationGrid = ({ selectedTool, onInterventionComplete }) => {
           if (cell.intervention) {
             drawInterventionIndicator(ctx, x * cellSize, y * cellSize, cellSize, cell.intervention);
           }
+          
+          // Draw progress indicators for infected cells
+          if (cell.state === 'infected') {
+            drawProgressIndicator(ctx, x * cellSize, y * cellSize, cellSize, cell.infectionTime, simulationParams.infectionDuration);
+          }
         }
         // Empty spaces remain white (transparent)
       }
     }
-  }, []);
+  }, [simulationParams]);
 
-  // Get color based on cell state
-  const getCellColor = (cell) => {
+  // Get color based on cell state with progress indication
+  const getCellColor = (cell, params) => {
     switch (cell.state) {
       case 'healthy':
         return '#4ade80'; // Green
       case 'infected':
-        return '#ef4444'; // Red
+        // Make infected cells darker as they progress
+        const progress = cell.infectionTime / params.infectionDuration;
+        const intensity = Math.max(0.3, 1 - progress * 0.5);
+        return `rgba(239, 68, 68, ${intensity})`; // Red with varying opacity
       case 'recovered':
         return '#3b82f6'; // Blue
       case 'dead':
@@ -73,6 +81,16 @@ const SimulationGrid = ({ selectedTool, onInterventionComplete }) => {
       default:
         return '#ffffff'; // White
     }
+  };
+
+  // Draw progress indicator for infected cells
+  const drawProgressIndicator = (ctx, x, y, size, currentTime, maxTime) => {
+    const progress = currentTime / maxTime;
+    const barHeight = 1;
+    const barWidth = size * progress;
+    
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(x, y + size - barHeight, barWidth, barHeight);
   };
 
   // Draw intervention indicators
@@ -151,6 +169,11 @@ const SimulationGrid = ({ selectedTool, onInterventionComplete }) => {
     gameLoop(updateSimulation, simulationParams.simulationSpeed);
   }, [gameLoop, updateSimulation, simulationParams.simulationSpeed]);
 
+  // Update simulation speed in real-time when it changes
+  useEffect(() => {
+    updateSimulationSpeed(simulationParams.simulationSpeed);
+  }, [simulationParams.simulationSpeed, updateSimulationSpeed]);
+
   // Initialize random infections
   const handleRandomInfections = useCallback(() => {
     const newGrid = initializeRandomInfections(grid, 20);
@@ -205,6 +228,24 @@ const SimulationGrid = ({ selectedTool, onInterventionComplete }) => {
         <div>Recovered: {statistics.recovered}</div>
         <div>Dead: {statistics.dead}</div>
         <div>R-Value: {statistics.rValue}</div>
+      </div>
+      <div className="simulation-legend">
+        <div className="legend-item">
+          <div className="legend-color" style={{backgroundColor: '#4ade80'}}></div>
+          <span>Healthy</span>
+        </div>
+        <div className="legend-item">
+          <div className="legend-color" style={{backgroundColor: '#ef4444'}}></div>
+          <span>Infected (progress bar shows time remaining)</span>
+        </div>
+        <div className="legend-item">
+          <div className="legend-color" style={{backgroundColor: '#3b82f6'}}></div>
+          <span>Recovered (immune)</span>
+        </div>
+        <div className="legend-item">
+          <div className="legend-color" style={{backgroundColor: '#1f2937'}}></div>
+          <span>Dead</span>
+        </div>
       </div>
     </div>
   );

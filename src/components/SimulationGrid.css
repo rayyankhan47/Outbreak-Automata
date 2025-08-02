@@ -93,4 +93,31 @@
   background: #1f2937;
   color: #ffffff;
   font-size: 1rem;
+}
+
+.simulation-legend {
+  display: flex;
+  gap: 20px;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.legend-color {
+  width: 16px;
+  height: 16px;
+  border-radius: 2px;
+  border: 1px solid #374151;
 } 

@@ -5,7 +5,7 @@ export const useGameLoop = () => {
   const animationFrameRef = useRef(null);
   const lastTimeRef = useRef(0);
   const updateFunctionRef = useRef(null);
-  const simulationSpeedRef = useRef(1.0);
+  const simulationSpeedRef = useRef(0.2); // Default to slower speed
 
   const startSimulation = useCallback(() => {
     setIsRunning(true);
@@ -19,9 +19,14 @@ export const useGameLoop = () => {
     }
   }, []);
 
-  const gameLoop = useCallback((updateFunction, simulationSpeed = 1.0) => {
+  const gameLoop = useCallback((updateFunction, simulationSpeed = 0.2) => {
     updateFunctionRef.current = updateFunction;
     simulationSpeedRef.current = simulationSpeed;
+  }, []);
+
+  // Function to update simulation speed dynamically
+  const updateSimulationSpeed = useCallback((newSpeed) => {
+    simulationSpeedRef.current = newSpeed;
   }, []);
 
   // Main animation loop
@@ -29,7 +34,8 @@ export const useGameLoop = () => {
     const animate = (currentTime) => {
       if (isRunning && updateFunctionRef.current) {
         // Calculate frame rate based on simulation speed
-        const baseFrameRate = 60; // 60 FPS base
+        // Base frame rate is now 12 FPS (slower), so 1x = 12 FPS
+        const baseFrameRate = 12; // 12 FPS base (much slower)
         const targetFrameRate = baseFrameRate * simulationSpeedRef.current;
         const frameInterval = 1000 / targetFrameRate;
         
@@ -59,6 +65,7 @@ export const useGameLoop = () => {
     isRunning,
     startSimulation,
     stopSimulation,
-    gameLoop
+    gameLoop,
+    updateSimulationSpeed
   };
 }; 
