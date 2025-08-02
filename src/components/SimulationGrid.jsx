@@ -1,11 +1,12 @@
-import React, { useRef, useEffect, useCallback } from 'react';
+import React, { useRef, useEffect, useCallback, useState } from 'react';
 import { useSimulationState } from '../hooks/useSimulationState';
 import { useGameLoop } from '../hooks/useGameLoop';
-import { updateGrid, initializeRandomInfections } from '../utils/simulationEngine';
+import { updateGrid, initializeRandomInfections, applyIntervention } from '../utils/simulationEngine';
 import './SimulationGrid.css';
 
-const SimulationGrid = () => {
+const SimulationGrid = ({ selectedTool, onInterventionComplete }) => {
   const canvasRef = useRef(null);
+  
   const { 
     grid, 
     setGrid, 
@@ -45,6 +46,11 @@ const SimulationGrid = () => {
           const color = getCellColor(cell);
           ctx.fillStyle = color;
           ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+          
+          // Draw intervention indicators
+          if (cell.intervention) {
+            drawInterventionIndicator(ctx, x * cellSize, y * cellSize, cellSize, cell.intervention);
+          }
         }
       }
     }
@@ -66,14 +72,58 @@ const SimulationGrid = () => {
     }
   };
 
-  // Handle canvas click for placing initial infections
+  // Draw intervention indicators
+  const drawInterventionIndicator = (ctx, x, y, size, intervention) => {
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 1;
+    
+    switch (intervention) {
+      case 'vaccinated':
+        // Draw a small cross
+        ctx.beginPath();
+        ctx.moveTo(x + size * 0.3, y + size * 0.3);
+        ctx.lineTo(x + size * 0.7, y + size * 0.7);
+        ctx.moveTo(x + size * 0.7, y + size * 0.3);
+        ctx.lineTo(x + size * 0.3, y + size * 0.7);
+        ctx.stroke();
+        break;
+        
+      case 'quarantine':
+        // Draw a border
+        ctx.strokeRect(x, y, size, size);
+        break;
+        
+      case 'hospital':
+        // Draw a plus sign
+        ctx.beginPath();
+        ctx.moveTo(x + size * 0.5, y + size * 0.2);
+        ctx.lineTo(x + size * 0.5, y + size * 0.8);
+        ctx.moveTo(x + size * 0.2, y + size * 0.5);
+        ctx.lineTo(x + size * 0.8, y + size * 0.5);
+        ctx.stroke();
+        break;
+        
+      default:
+        break;
+    }
+  };
+
+  // Handle canvas click for placing initial infections or interventions
   const handleCanvasClick = useCallback((e) => {
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
     const x = Math.floor((e.clientX - rect.left) / 4);
     const y = Math.floor((e.clientY - rect.top) / 4);
     
-    if (grid[y]?.[x]?.state === 'healthy') {
+    if (selectedTool) {
+      // Apply intervention
+      const newGrid = applyIntervention(grid, selectedTool, x, y);
+      setGrid(newGrid);
+      if (onInterventionComplete) {
+        onInterventionComplete();
+      }
+    } else if (grid[y]?.[x]?.state === 'healthy') {
+      // Place infection if no tool selected
       const newGrid = [...grid];
       newGrid[y][x] = { 
         state: 'infected', 
@@ -82,7 +132,7 @@ const SimulationGrid = () => {
       };
       setGrid(newGrid);
     }
-  }, [grid, setGrid]);
+  }, [grid, setGrid, selectedTool, onInterventionComplete]);
 
   // Simulation update function
   const updateSimulation = useCallback(() => {
@@ -111,7 +161,7 @@ const SimulationGrid = () => {
       <canvas
         ref={canvasRef}
         onClick={handleCanvasClick}
-        className="simulation-canvas"
+        className={`simulation-canvas ${selectedTool ? 'tool-selected' : ''}`}
       />
       <div className="simulation-controls">
         <button onClick={isRunning ? stopSimulation : startSimulation}>

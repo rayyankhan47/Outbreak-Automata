@@ -1,0 +1,154 @@
+.intervention-tools {
+  background: rgba(255, 255, 255, 0.95);
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  min-width: 300px;
+  max-width: 400px;
+}
+
+.intervention-tools h3 {
+  margin: 0 0 20px 0;
+  color: #1f2937;
+  font-family: 'Courier New', monospace;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-align: center;
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 10px;
+}
+
+.tools-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.tool-button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border: 2px solid #e5e7eb;
+  border-radius: 6px;
+  background: #ffffff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Courier New', monospace;
+  text-align: left;
+}
+
+.tool-button:hover:not(:disabled) {
+  border-color: #374151;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.tool-button.selected {
+  border-color: #3b82f6;
+  background: #eff6ff;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+}
+
+.tool-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.tool-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  border: 2px solid #374151;
+  flex-shrink: 0;
+}
+
+.tool-info {
+  flex: 1;
+}
+
+.tool-name {
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.9rem;
+}
+
+.tool-supply {
+  font-size: 0.8rem;
+  color: #6b7280;
+  margin-top: 2px;
+}
+
+.tool-description {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  padding: 12px;
+  margin-bottom: 15px;
+}
+
+.tool-description p {
+  margin: 0 0 8px 0;
+  font-size: 0.85rem;
+  color: #374151;
+  line-height: 1.4;
+}
+
+.tool-instruction {
+  font-weight: 600;
+  color: #3b82f6 !important;
+  font-style: italic;
+}
+
+.tool-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.tool-actions button {
+  flex: 1;
+  padding: 8px 12px;
+  border: 2px solid #374151;
+  border-radius: 4px;
+  background: #ffffff;
+  color: #374151;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tool-actions button:hover:not(:disabled) {
+  background: #374151;
+  color: #ffffff;
+}
+
+.tool-actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.clear-tool {
+  border-color: #ef4444 !important;
+  color: #ef4444 !important;
+}
+
+.clear-tool:hover:not(:disabled) {
+  background: #ef4444 !important;
+  color: #ffffff !important;
+}
+
+.refill-supply {
+  border-color: #10b981 !important;
+  color: #10b981 !important;
+}
+
+.refill-supply:hover:not(:disabled) {
+  background: #10b981 !important;
+  color: #ffffff !important;
+} 

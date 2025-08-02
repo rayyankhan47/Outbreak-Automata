@@ -56,15 +56,35 @@ body {
   display: flex;
   gap: 30px;
   align-items: flex-start;
-  max-width: 1200px;
+  max-width: 1400px;
   width: 100%;
 }
 
+.left-panel {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.right-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 320px;
+}
+
 /* Responsive design */
-@media (max-width: 1024px) {
+@media (max-width: 1200px) {
   .app-content {
     flex-direction: column;
     align-items: center;
+  }
+  
+  .right-panel {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    min-width: auto;
   }
 }
 
@@ -79,5 +99,9 @@ body {
   
   .app-content {
     gap: 20px;
+  }
+  
+  .right-panel {
+    flex-direction: column;
   }
 }
